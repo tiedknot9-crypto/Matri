@@ -98,21 +98,21 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
   ];
 
   return (
-    <div className={`mx-auto space-y-8 ${isPublic ? 'max-w-5xl' : 'max-w-4xl'}`}>
-      <div className={`border-b border-gold/20 pb-6 ${isPublic ? 'text-center' : ''}`}>
-        <h1 className={`${isPublic ? 'text-4xl' : 'text-3xl'} font-serif font-bold text-vermilion`}>
+    <div className={`mx-auto space-y-6 md:space-y-8 ${isPublic ? 'max-w-5xl' : 'max-w-4xl'} px-4 md:px-0`}>
+      <div className={`border-b border-gold/20 pb-4 md:pb-6 ${isPublic ? 'text-center' : ''}`}>
+        <h1 className={`${isPublic ? 'text-2xl md:text-4xl' : 'text-xl md:text-3xl'} font-serif font-bold text-vermilion`}>
           {isPublic ? 'Begin Your Auspicious Journey' : 'Register New Profile'}
         </h1>
-        <p className="text-gray-500 mt-2">
+        <p className="text-xs md:text-sm text-gray-500 mt-2">
           {isPublic ? 'Join thousands of families finding their ideal match' : 'Complete formal matrimonial onboarding'}
         </p>
 
         {/* Stepper UI */}
-        <div className="mt-10 flex items-center justify-center gap-2 md:gap-4 overflow-x-auto pb-4 px-2">
+        <div className="mt-8 md:mt-10 flex items-center justify-start md:justify-center gap-4 md:gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
           {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               <div 
-                className={`flex flex-col items-center gap-2 min-w-[60px] cursor-pointer group`}
+                className={`flex flex-col items-center gap-2 min-w-[70px] cursor-pointer group`}
                 onClick={() => currentStep > step.id && setCurrentStep(step.id)}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 
@@ -121,20 +121,20 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
                 >
                   {currentStep > step.id ? <CheckCircle size={20} /> : step.icon}
                 </div>
-                <span className={`text-[9px] font-bold uppercase tracking-wider ${currentStep === step.id ? 'text-vermilion' : 'text-gray-400'}`}>
+                <span className={`text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-center ${currentStep === step.id ? 'text-vermilion' : 'text-gray-400'}`}>
                   {step.title}
                 </span>
               </div>
               {idx < steps.length - 1 && (
-                <div className={`h-0.5 w-8 md:w-16 ${currentStep > step.id ? 'bg-green-500' : 'bg-gold/10'}`} />
+                <div className={`h-0.5 min-w-[20px] md:w-16 ${currentStep > step.id ? 'bg-green-500' : 'bg-gold/10'}`} />
               )}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 md:p-12 rounded-[2rem] shadow-traditional border border-gold/10 relative">
-        <div className="min-h-[400px]">
+      <form onSubmit={handleSubmit} className="bg-white p-6 md:p-12 rounded-2xl md:rounded-[2rem] shadow-traditional border border-gold/10 relative">
+        <div className="min-h-[300px] md:min-h-[400px]">
           {currentStep === 1 && (
             <motion.section 
               initial={{ opacity: 0, x: 20 }} 
@@ -142,10 +142,10 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
               className="space-y-6"
             >
               <div className="flex items-center gap-3 border-b border-ivory pb-3">
-                <div className="w-10 h-10 bg-vermilion/5 rounded-full flex items-center justify-center">
-                  <User size={20} className="text-vermilion" />
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-vermilion/5 rounded-full flex items-center justify-center">
+                  <User size={16} md:size={20} className="text-vermilion" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-vermilion">Step 1: Personal Identity</h3>
+                <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 1: Personal Identity</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input label="Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
@@ -206,12 +206,12 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
               className="space-y-6"
             >
               <div className="flex items-center gap-3 border-b border-ivory pb-3">
-                <div className="w-10 h-10 bg-gold/5 rounded-full flex items-center justify-center">
-                  <span className="text-xl">🪐</span>
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gold/5 rounded-full flex items-center justify-center">
+                  <span className="text-lg md:text-xl">🪐</span>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-vermilion">Step 2: Birth & Astrology</h3>
+                <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 2: Birth & Astrology</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 <Input label="Date of Birth" type="date" value={formData.dob} onChange={v => setFormData({...formData, dob: v})} />
                 <Input label="Birth Time" type="time" value={formData.birthTime} onChange={v => setFormData({...formData, birthTime: v})} />
                 <Input label="Birth Place" value={formData.birthPlace} onChange={v => setFormData({...formData, birthPlace: v})} />
@@ -226,13 +226,13 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
             <motion.section 
               initial={{ opacity: 0, x: 20 }} 
               animate={{ opacity: 1, x: 0 }}
-              className="space-y-10"
+              className="space-y-8 md:space-y-10"
             >
               <div className="flex items-center gap-3 border-b border-ivory pb-3">
-                <div className="w-10 h-10 bg-peacock/5 rounded-full flex items-center justify-center">
-                  <GraduationCap size={20} className="text-peacock" />
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-peacock/5 rounded-full flex items-center justify-center">
+                  <GraduationCap size={16} md:size={20} className="text-peacock" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-vermilion">Step 3: Career & Lifestyle</h3>
+                <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 3: Career & Lifestyle</h3>
               </div>
 
               {/* Education Section */}
@@ -403,17 +403,17 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
               className="space-y-6"
             >
               <div className="flex items-center gap-3 border-b border-ivory pb-3">
-                <div className="w-10 h-10 bg-vermilion/5 rounded-full flex items-center justify-center">
-                  <Users size={20} className="text-vermilion" />
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-vermilion/5 rounded-full flex items-center justify-center">
+                  <Users size={16} md:size={20} className="text-vermilion" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-vermilion">Step 4: Family Context</h3>
+                <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 4: Family Context</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <Input label="Father's Job" value={formData.fatherJob} onChange={v => setFormData({...formData, fatherJob: v})} />
                 <Input label="Mother's Job" value={formData.motherJob} onChange={v => setFormData({...formData, motherJob: v})} />
                 <Input label="Siblings" value={formData.siblings} onChange={v => setFormData({...formData, siblings: v})} />
                 <textarea 
-                  className="md:col-span-2 w-full p-4 border border-gray-200 rounded-2xl bg-ivory/20 text-sm focus:ring-1 focus:ring-gold outline-none min-h-[120px]" 
+                  className="sm:col-span-2 w-full p-4 border border-gray-200 rounded-xl md:rounded-2xl bg-ivory/20 text-sm focus:ring-1 focus:ring-gold outline-none min-h-[100px] md:min-h-[120px]" 
                   placeholder="Tell us about your family background and value system..."
                   value={formData.familyBackground}
                   onChange={e => setFormData({...formData, familyBackground: e.target.value})}
@@ -429,10 +429,10 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
               className="space-y-6"
             >
               <div className="flex items-center gap-3 border-b border-ivory pb-3">
-                <div className="w-10 h-10 bg-gold/5 rounded-full flex items-center justify-center">
-                  <Upload size={20} className="text-gold" />
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gold/5 rounded-full flex items-center justify-center">
+                  <Upload size={16} md:size={20} className="text-gold" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-vermilion">Step 5: Document Verification</h3>
+                <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 5: Document Verification</h3>
               </div>
               <p className="text-sm text-gray-500">
                 Uploading verification documents increases your profile trust score by 40% and speeds up the manual approval process.
@@ -449,33 +449,35 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
         </div>
 
         {/* Navigation Buttons */}
-        <div className="mt-12 flex items-center justify-between gap-4 border-t border-ivory pt-8">
-          <button 
-            type="button"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className={`px-8 py-3 rounded-full font-bold transition-all border-2 
-              ${currentStep === 1 ? 'opacity-0 cursor-default' : 'text-vermilion border-vermilion hover:bg-vermilion/5'}`}
-          >
-            Previous
-          </button>
-
-          {currentStep < totalSteps ? (
+        <div className="mt-8 md:mt-12 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-ivory pt-6 md:pt-8">
+          <div className="flex items-center justify-between w-full md:w-auto gap-4">
             <button 
               type="button"
-              onClick={nextStep}
-              className="bg-vermilion text-white px-10 py-3 rounded-full font-bold shadow-xl hover:bg-vermilion-light transition-all flex items-center gap-2"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className={`flex-1 md:flex-none px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold transition-all border-2 
+                ${currentStep === 1 ? 'opacity-0 cursor-default pointer-events-none' : 'text-vermilion border-vermilion hover:bg-vermilion/5'}`}
             >
-              Next Step
+              Previous
             </button>
-          ) : (
-            <button 
-              type="submit"
-              className="bg-green-600 text-white px-10 py-3 rounded-full font-bold shadow-xl hover:bg-green-700 transition-all flex items-center gap-2"
-            >
-              <CheckCircle size={18} /> Complete Registration
-            </button>
-          )}
+
+            {currentStep < totalSteps ? (
+              <button 
+                type="button"
+                onClick={nextStep}
+                className="flex-1 md:flex-none bg-vermilion text-white px-8 md:px-10 py-2.5 md:py-3 rounded-full font-bold shadow-xl hover:bg-vermilion-light transition-all flex items-center justify-center gap-2"
+              >
+                Next Step
+              </button>
+            ) : (
+              <button 
+                type="submit"
+                className="flex-1 md:flex-none bg-green-600 text-white px-8 md:px-10 py-2.5 md:py-3 rounded-full font-bold shadow-xl hover:bg-green-700 transition-all flex items-center justify-center gap-2"
+              >
+                <CheckCircle size={18} /> Complete
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </div>

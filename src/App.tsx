@@ -40,42 +40,42 @@ const ServiceCard = ({ icon, title, desc }: { icon: any, title: string, desc: st
 );
 
 const MatchmakingPreview = () => (
-  <section className="py-24 bg-white">
-    <div className="container mx-auto px-6">
-       <div className="max-w-4xl mx-auto text-center space-y-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-vermilion/5 border border-vermilion/10 text-vermilion text-xs font-bold uppercase tracking-widest">
+  <section className="py-16 md:py-24 bg-white">
+    <div className="container mx-auto px-4 md:px-6 lg:px-10">
+       <div className="max-w-4xl mx-auto text-center space-y-8 md:space-y-12">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-vermilion/5 border border-vermilion/10 text-vermilion text-[10px] md:text-xs font-bold uppercase tracking-widest">
             <Heart size={14} className="fill-vermilion" /> Premium Experience
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-vermilion leading-tight">
-            Unlock Auspicious Matches & <br/>
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-vermilion leading-tight">
+            Unlock Auspicious Matches & <br className="hidden md:block"/>
             <span className="text-gold italic font-normal">Deep Astrological Insights</span>
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed italic">
+          <p className="text-base md:text-lg text-gray-600 leading-relaxed italic">
             "Destiny brings two souls together, but we help you find the one whose stars align with yours."
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-             <div className="bg-ivory/50 p-8 rounded-3xl border border-gold/10 space-y-4">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gold/10">
-                   <Users className="text-vermilion" size={24} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 text-left">
+             <div className="bg-ivory/50 p-6 md:p-8 rounded-3xl border border-gold/10 space-y-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gold/10">
+                   <Users className="text-vermilion" size={20} md:size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-vermilion">Verified Recommendations</h3>
-                <p className="text-sm text-gray-500">Access thousands of handpicked profiles verified by our dedicated family managers. No fakes, only serious marriage proposals.</p>
+                <h3 className="text-lg md:text-xl font-bold text-vermilion">Verified Recommendations</h3>
+                <p className="text-xs md:text-sm text-gray-500">Access thousands of handpicked profiles verified by our dedicated family managers. No fakes, only serious marriage proposals.</p>
              </div>
-             <div className="bg-ivory/50 p-8 rounded-3xl border border-gold/10 space-y-4">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gold/10">
-                   <Sparkles className="text-gold" size={24} />
+             <div className="bg-ivory/50 p-6 md:p-8 rounded-3xl border border-gold/10 space-y-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gold/10">
+                   <Sparkles className="text-gold" size={20} md:size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-vermilion">Guna Milan & Dosha analysis</h3>
-                <p className="text-sm text-gray-500">View detailed Kundli charts and astrological compatibility scores instantly. We handle the complex Manglik and Shani calculations for you.</p>
+                <h3 className="text-lg md:text-xl font-bold text-vermilion">Guna Milan & Dosha analysis</h3>
+                <p className="text-xs md:text-sm text-gray-500">View detailed Kundli charts and astrological compatibility scores instantly. We handle the complex Manglik and Shani calculations for you.</p>
              </div>
           </div>
 
-          <div className="pt-8">
-             <a href="#register" className="inline-flex items-center gap-3 bg-vermilion text-white px-12 py-5 rounded-full font-bold text-lg shadow-2xl shadow-vermilion/20 hover:scale-105 transition-all">
+          <div className="pt-4 md:pt-8 w-full md:w-auto px-4 md:px-0">
+             <a href="#register" className="inline-flex items-center justify-center gap-3 bg-vermilion text-white px-8 md:px-12 py-4 md:py-5 rounded-full font-bold text-base md:text-lg shadow-2xl shadow-vermilion/20 hover:scale-105 transition-all w-full md:w-auto">
                Get Started for Free <Heart size={20} />
              </a>
-             <p className="text-xs text-gray-400 mt-4">Takes less than 2 minutes to create your profile</p>
+             <p className="text-[10px] md:text-xs text-gray-400 mt-4">Takes less than 2 minutes to create your profile</p>
           </div>
        </div>
     </div>
@@ -107,8 +107,16 @@ function App() {
     const error = params.get('error');
 
     if (status && txnid && amount) {
-      // Normalize common pseudo-errors
-      const normalizedError = (error === 'E000' || error === 'No Error' || !error) ? undefined : error;
+      // Normalize common pseudo-errors and empty strings
+      const rawError = String(error || '').trim();
+      const normalizedError = (
+        !rawError || 
+        rawError === 'E000' || 
+        rawError.toLowerCase() === 'no error' || 
+        rawError.toLowerCase() === 'success' ||
+        rawError.toLowerCase() === 'null' ||
+        rawError.toLowerCase() === 'undefined'
+      ) ? undefined : rawError;
       
       setPaymentResult({ status, txnid, amount, error: normalizedError });
       if (status === 'success' && currentUser) {
@@ -307,7 +315,7 @@ function App() {
         <main className="flex-1 p-0 space-y-0 bg-[#faf9f6]">
           
           {/* Hero Section */}
-          <section className="relative h-[500px] overflow-hidden flex items-center justify-center text-center px-6">
+          <section className="relative min-h-[400px] md:h-[500px] overflow-hidden flex items-center justify-center text-center px-4 md:px-6">
             <div className="absolute inset-0 z-0">
                <img 
                  src="https://picsum.photos/seed/sacred/1920/1080?blur=2" 
@@ -321,42 +329,42 @@ function App() {
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="relative z-10 max-w-3xl mx-auto"
+              className="relative z-10 max-w-3xl mx-auto py-12 md:py-0"
             >
-              <div className="flex justify-center mb-6">
-                 <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center border border-gold/20">
-                    <Sparkles className="text-gold" size={32} />
+              <div className="flex justify-center mb-4 md:mb-6">
+                 <div className="w-12 h-12 md:w-16 md:h-16 bg-gold/10 rounded-full flex items-center justify-center border border-gold/20">
+                    <Sparkles className="text-gold" size={24} md:size={32} />
                  </div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-serif font-bold text-vermilion mb-6 leading-tight">
-                Authentic Matchmaking for <br/>
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif font-bold text-vermilion mb-4 md:mb-6 leading-tight">
+                Authentic Matchmaking for <br className="hidden md:block"/>
                 <span className="text-gold italic font-normal">Traditional Families</span>
               </h1>
-              <p className="text-traditional-text font-serif italic text-xl mb-10 max-w-2xl mx-auto">
+              <p className="text-traditional-text font-serif italic text-lg md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto">
                 Where every connection is blessed by stars and verified by humans. Find your destined life partner today.
               </p>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-6 mt-8">
-                <div className="relative group flex-1 max-w-[280px]">
-                  <a href="#register" className="flex items-center justify-center bg-vermilion text-white h-[64px] px-8 rounded-full font-bold shadow-2xl shadow-vermilion/30 hover:bg-vermilion-light hover:scale-105 transition-all text-lg w-full">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 md:gap-6 mt-4 md:mt-8 px-4 sm:px-0">
+                <div className="relative group flex-1 max-w-full sm:max-w-[280px]">
+                  <a href="#register" className="flex items-center justify-center bg-vermilion text-white h-[56px] md:h-[64px] px-6 md:px-8 rounded-full font-bold shadow-2xl shadow-vermilion/30 hover:bg-vermilion-light hover:scale-105 transition-all text-base md:text-lg w-full">
                     Join Now — It's Free
                   </a>
-                  <p className="absolute -bottom-6 left-0 right-0 text-[10px] text-gray-400 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="absolute -bottom-6 left-0 right-0 text-[10px] text-gray-400 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block">
                     Takes less than 2 mins
                   </p>
                 </div>
 
-                <div className="relative flex-1 max-w-[280px]">
+                <div className="relative flex-1 max-w-full sm:max-w-[280px]">
                   <button 
                     onClick={() => setIsFamilyMode(!isFamilyMode)} 
                     className={cn(
-                      "h-[64px] px-8 rounded-full font-bold transition-all text-lg w-full border-2 flex items-center justify-center gap-2 shadow-xl",
+                      "h-[56px] md:h-[64px] px-6 md:px-8 rounded-full font-bold transition-all text-base md:text-lg w-full border-2 flex items-center justify-center gap-2 shadow-xl",
                       isFamilyMode ? "bg-saffron text-white border-saffron" : "bg-white text-vermilion border-vermilion hover:bg-ivory"
                     )}
                   >
-                    <Users size={20} />
+                    <Users size={18} md:size={20} />
                     {isFamilyMode ? 'Standard View' : 'Family Mode'}
                   </button>
-                  <p className="absolute -bottom-6 left-0 right-0 text-[10px] text-gray-500 font-medium italic opacity-70">
+                  <p className="absolute -bottom-6 left-0 right-0 text-[10px] text-gray-500 font-medium italic opacity-70 hidden sm:block">
                     {isFamilyMode ? 'Elder-friendly view active' : 'For parents & guardians'}
                   </p>
                 </div>
@@ -379,31 +387,31 @@ function App() {
           </section>
 
           {/* Services Section */}
-          <section className="py-20 bg-white">
-            <div className="container mx-auto px-10">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl font-serif font-bold text-vermilion mb-4">Our Sacred Services</h2>
-                <div className="w-24 h-1 bg-gold/30 mx-auto rounded-full"></div>
+          <section className="py-12 md:py-20 bg-white">
+            <div className="container mx-auto px-4 md:px-10">
+              <div className="text-center mb-10 md:mb-16">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-vermilion mb-4">Our Sacred Services</h2>
+                <div className="w-20 md:w-24 h-1 bg-gold/30 mx-auto rounded-full"></div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 <ServiceCard 
-                  icon={<Search size={32} className="text-vermilion" />}
+                  icon={<Search size={28} md:size={32} className="text-vermilion" />}
                   title="Find Perfect Partner"
                   desc="Filter through thousands of verified profiles across castes and religions."
                 />
                 <ServiceCard 
-                  icon={<Sparkles size={32} className="text-gold" />}
+                  icon={<Sparkles size={28} md:size={32} className="text-gold" />}
                   title="Kundli Matching"
                   desc="Detailed Guna Milan and Dosha analysis powered by expert astrology."
                 />
                 <ServiceCard 
-                  icon={<LifeBuoy size={32} className="text-peacock" />}
+                  icon={<LifeBuoy size={28} md:size={32} className="text-peacock" />}
                   title="Personal Support"
                   desc="Dedicated managers to assist you in every step of your journey."
                 />
                 <ServiceCard 
-                  icon={<Star size={32} className="text-saffron" />}
+                  icon={<Star size={28} md:size={32} className="text-saffron" />}
                   title="Rate Profiles"
                   desc="Give feedback and help us improve recommendations for your family."
                 />
@@ -418,7 +426,7 @@ function App() {
           {!currentUser ? (
             <MatchmakingPreview />
           ) : (
-            <div className="container mx-auto px-6 py-20">
+            <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
               {/* Payment Result Notification */}
               <AnimatePresence>
                 {paymentResult && (
@@ -426,19 +434,19 @@ function App() {
                     initial={{ opacity: 0, scale: 0.9, y: -20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                    className={`mb-12 p-6 rounded-3xl border-2 flex items-center justify-between gap-6 shadow-xl ${
+                    className={`mb-8 md:mb-12 p-4 md:p-6 rounded-3xl border-2 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 shadow-xl ${
                       paymentResult.status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-full ${paymentResult.status === 'success' ? 'bg-green-100' : 'bg-red-100'}`}>
-                        {paymentResult.status === 'success' ? <CheckCircle size={32} /> : <XCircle size={32} />}
+                    <div className="flex items-center gap-4 text-center md:text-left">
+                      <div className={`p-2 md:p-3 rounded-full ${paymentResult.status === 'success' ? 'bg-green-100' : 'bg-red-100'}`}>
+                        {paymentResult.status === 'success' ? <CheckCircle size={24} md:size={32} /> : <XCircle size={24} md:size={32} />}
                       </div>
                       <div>
-                        <h4 className="text-xl font-bold font-serif">
+                        <h4 className="text-lg md:text-xl font-bold font-serif">
                           {paymentResult.status === 'success' ? 'Auspicious Start! Recharge Successful' : 'Payment Interrupted'}
                         </h4>
-                        <p className="text-sm opacity-80">
+                        <p className="text-xs md:text-sm opacity-80">
                           {paymentResult.error ? (
                             <span className="text-red-600 font-bold">Error: {paymentResult.error}</span>
                           ) : (
@@ -455,34 +463,34 @@ function App() {
               </AnimatePresence>
 
               {/* Dashboard Navigation */}
-              <div className="flex flex-wrap items-center gap-2 mb-12 p-2 bg-ivory/30 rounded-[2rem] border border-gold/10 w-fit">
+              <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-12 p-1.5 md:p-2 bg-ivory/30 rounded-2xl md:rounded-[2rem] border border-gold/10 w-fit">
                 <button 
                   onClick={() => setDashboardTab('matches')}
-                  className={`px-8 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
+                  className={`px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all flex items-center gap-2 ${
                     dashboardTab === 'matches' ? 'bg-vermilion text-white shadow-lg' : 'text-gray-500 hover:bg-white/50'
                   }`}
                 >
-                  <Heart size={16} /> Recommended Matches
+                  <Heart size={14} md:size={16} /> <span className="whitespace-nowrap">Matches</span>
                 </button>
                 <button 
                   onClick={() => setDashboardTab('requests')}
-                  className={`px-8 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
+                  className={`px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all flex items-center gap-2 ${
                     dashboardTab === 'requests' ? 'bg-vermilion text-white shadow-lg' : 'text-gray-500 hover:bg-white/50'
                   }`}
                 >
-                  <Users size={16} /> Requests & Interests
+                  <Users size={14} md:size={16} /> <span className="whitespace-nowrap">Requests</span>
                 </button>
                 <button 
                   onClick={() => setDashboardTab('wallet')}
-                  className={`px-8 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
+                  className={`px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all flex items-center gap-2 ${
                     dashboardTab === 'wallet' ? 'bg-vermilion text-white shadow-lg' : 'text-gray-500 hover:bg-white/50'
                   }`}
                 >
-                  <WalletIcon size={16} /> Sacred Wallet
+                  <WalletIcon size={14} md:size={16} /> <span className="whitespace-nowrap">Wallet</span>
                 </button>
               </div>
 
-              <div className="space-y-16">
+              <div className="space-y-12 md:space-y-16">
                 {dashboardTab === 'matches' && (
                   <>
                     {/* Preferences Section */}
@@ -518,7 +526,7 @@ function App() {
                       </header>
 
                       {/* Matches Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                       <AnimatePresence>
                         {[...profiles]
                           .filter(p => !p.isManager && p.id !== currentUser.id && p.approvalStatus === 'Approved')
@@ -550,22 +558,22 @@ function App() {
                       <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-orange-50 border border-dashed border-saffron rounded-xl flex items-center justify-center text-center p-8 transition-all hover:shadow-md cursor-pointer"
+                        className="bg-orange-50 border border-dashed border-saffron rounded-xl flex items-center justify-center text-center p-6 md:p-8 transition-all hover:shadow-md cursor-pointer"
                       >
                         <div>
-                          <span className="text-3xl mb-2 block">🪐</span>
-                          <strong className="text-vermilion block">View Your Kundli Chart</strong>
-                          <span className="text-xs text-gray-600 font-sans">Understand your Doshas & Guna Milan potential</span>
+                          <span className="text-2xl md:text-3xl mb-2 block">🪐</span>
+                          <strong className="text-vermilion block text-sm md:text-base">View Your Kundli Chart</strong>
+                          <span className="text-[10px] md:text-xs text-gray-600 font-sans">Understand your Doshas & Guna Milan potential</span>
                         </div>
                       </motion.div>
                       </div>
                     </div>
 
                     {/* Kundli Matching Section - Expanded Details */}
-                    <section className="bg-white border border-gold rounded-2xl p-8 shadow-sm">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                          <div className="md:col-span-2 space-y-6">
-                              <h2 className="text-2xl font-bold text-vermilion border-b border-ivory pb-2">Birth Details (जन्म विवरण)</h2>
+                    <section className="bg-white border border-gold rounded-2xl p-6 md:p-8 shadow-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                          <div className="md:col-span-2 space-y-4 md:space-y-6">
+                              <h2 className="text-xl md:text-2xl font-bold text-vermilion border-b border-ivory pb-2">Birth Details (जन्म विवरण)</h2>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date of Birth</label>
@@ -576,11 +584,11 @@ function App() {
                                   <input className="w-full bg-ivory border border-gray-200 rounded px-3 py-2 text-sm" placeholder="HH:MM AM/PM" />
                                 </div>
                               </div>
-                              <div className="p-4 bg-ivory/50 rounded-lg italic text-sm text-gray-700 border-l-2 border-gold">
+                              <div className="p-4 bg-ivory/50 rounded-lg italic text-xs md:text-sm text-gray-700 border-l-2 border-gold">
                                 {isInsightLoading ? 'Reading your stars...' : aiInsight}
                               </div>
                           </div>
-                          <div className="flex flex-col items-center justify-center space-y-4">
+                          <div className="flex flex-col items-center justify-center space-y-4 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gold/10">
                             <GunaMilanMeter score={30} />
                             <KundliChart />
                           </div>
@@ -675,22 +683,21 @@ function App() {
 
       <Footer onShowLegal={setLegalView} />
 
-      {/* Login Modal */}
       <AnimatePresence>
         {showLogin && (
-          <div className="fixed inset-0 bg-black/70 z-[110] flex items-center justify-center p-6">
+          <div className="fixed inset-0 bg-black/70 z-[110] flex items-center justify-center p-4 md:p-6">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl border border-gold/20 text-center space-y-8"
+              className="bg-white rounded-2xl md:rounded-[2rem] p-6 md:p-10 max-w-md w-full shadow-2xl border border-gold/20 text-center space-y-6 md:space-y-8"
             >
-              <div className="w-20 h-20 bg-vermilion/5 rounded-full flex items-center justify-center mx-auto border border-vermilion/10">
-                <Shield className="text-vermilion" size={32} />
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-vermilion/5 rounded-full flex items-center justify-center mx-auto border border-vermilion/10">
+                <Shield className="text-vermilion" size={28} md:size={32} />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-serif font-bold text-vermilion">Secure Access</h3>
-                <p className="text-sm text-gray-500">Sign in to view your auspicious matches and Kundli reports.</p>
+              <div className="space-y-1 md:space-y-2">
+                <h3 className="text-xl md:text-2xl font-serif font-bold text-vermilion">Secure Access</h3>
+                <p className="text-xs md:text-sm text-gray-500 px-4 md:px-0">Sign in to view your auspicious matches and Kundli reports.</p>
               </div>
               
               <form onSubmit={handleLogin} className="space-y-4 text-left">
@@ -698,7 +705,7 @@ function App() {
                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email or Client ID</label>
                      <input 
                        required
-                       className="w-full p-4 border border-gray-100 rounded-2xl bg-ivory/50 text-sm outline-none focus:ring-1 focus:ring-gold"
+                       className="w-full p-3 md:p-4 border border-gray-100 rounded-xl md:rounded-2xl bg-ivory/50 text-sm outline-none focus:ring-1 focus:ring-gold"
                        placeholder="e.g., karthik@example.com or user"
                        value={loginEmail}
                        onChange={e => setLoginEmail(e.target.value)}
@@ -709,16 +716,16 @@ function App() {
                      <input 
                        required
                        type="password"
-                       className="w-full p-4 border border-gray-100 rounded-2xl bg-ivory/50 text-sm outline-none focus:ring-1 focus:ring-gold"
+                       className="w-full p-3 md:p-4 border border-gray-100 rounded-xl md:rounded-2xl bg-ivory/50 text-sm outline-none focus:ring-1 focus:ring-gold"
                        placeholder="••••••••"
                        value={loginPassword}
                        onChange={e => setLoginPassword(e.target.value)}
                      />
                   </div>
-                  <div className="p-3 bg-ivory/30 rounded-xl text-[10px] text-gray-400 italic">
+                  <div className="p-3 bg-ivory/30 rounded-xl text-[9px] md:text-[10px] text-gray-400 italic">
                     For demo: Admin (admin / 12345) | User (user / 12345)
                   </div>
-                  <button type="submit" className="w-full bg-vermilion text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-vermilion/20 hover:scale-[1.02] transition-all">
+                  <button type="submit" className="w-full bg-vermilion text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg shadow-xl shadow-vermilion/20 hover:scale-[1.02] transition-all">
                     Enter Matrimonial Plus
                   </button>
               </form>

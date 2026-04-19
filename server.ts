@@ -45,7 +45,7 @@ async function startServer() {
       
       // Attempt to get the origin from environment or request headers
       const host = req.get('host');
-      const protocol = req.protocol;
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
       const origin = process.env.APP_URL || `${protocol}://${host}`;
 
       const paymentData = {
@@ -173,12 +173,27 @@ async function startServer() {
     const amount = response.amount;
     
     let errorMsg = response.error_Message || response.field9 || response.error || '';
-    // Filter out pseudo-errors like E000 or "No Error"
-    if (errorMsg === 'E000' || errorMsg.toLowerCase() === 'no error') {
+    
+    // Normalize and clean error message
+    const cleanError = String(errorMsg).trim();
+    if (
+      !cleanError || 
+      cleanError === 'E000' || 
+      cleanError.toLowerCase() === 'no error' || 
+      cleanError.toLowerCase() === 'success' ||
+      cleanError.toLowerCase() === 'undefined' ||
+      cleanError.toLowerCase() === 'null'
+    ) {
       errorMsg = '';
     }
     
-    res.redirect(`/payment-callback?status=${status}&txnid=${txnid}&amount=${amount}&error=${encodeURIComponent(errorMsg)}`);
+    // Construct redirect URL, omitting error param if empty to keep it clean
+    let redirectUrl = `/payment-callback?status=${status}&txnid=${txnid}&amount=${amount}`;
+    if (errorMsg) {
+      redirectUrl += `&error=${encodeURIComponent(errorMsg)}`;
+    }
+    
+    res.redirect(redirectUrl);
   });
 
   // API Route for PayU Hash Generation (Old manual way, keeping for compatibility if needed)

@@ -41,8 +41,22 @@ export const WalletPanel = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to initiate payment');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to initiate payment');
+        } else {
+          const text = await response.text();
+          console.error('Server returned non-JSON response:', text);
+          throw new Error('Server error: The payment service is currently unavailable. Please try again later.');
+        }
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Expected JSON but received:', text);
+        throw new Error('Received invalid response format from server.');
       }
 
       const { html } = await response.json();
@@ -62,21 +76,21 @@ export const WalletPanel = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Balance Card */}
-      <div className="bg-gradient-to-br from-vermilion to-saffron rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-vermilion to-saffron rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <span className="text-white/70 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-              <WalletIcon size={16} /> Current Balance
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-1 md:space-y-2 text-center lg:text-left">
+            <span className="text-white/70 text-[10px] md:text-sm font-bold uppercase tracking-widest flex items-center justify-center lg:justify-start gap-2">
+              <WalletIcon size={14} md:size={16} /> Current Balance
             </span>
-            <div className="text-5xl font-serif font-bold">₹{balance.toLocaleString()}</div>
+            <div className="text-3xl md:text-5xl font-serif font-bold">₹{balance.toLocaleString()}</div>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 flex-grow max-w-md">
-            <div className="flex items-center gap-4">
-              <div className="flex-grow">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/20 flex-grow max-w-full lg:max-w-md">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex-grow w-full">
                 <label className="text-[10px] font-bold text-white/60 uppercase block mb-1">Add Amount (INR)</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white font-bold">₹</span>
@@ -84,7 +98,7 @@ export const WalletPanel = () => {
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl py-3 pl-8 pr-4 text-white font-bold outline-none focus:ring-1 focus:ring-gold"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl py-2.5 md:py-3 pl-8 pr-4 text-white font-bold outline-none focus:ring-1 focus:ring-gold text-sm md:text-base"
                     placeholder="500"
                   />
                 </div>
@@ -92,11 +106,11 @@ export const WalletPanel = () => {
               <button 
                 onClick={handleAddFunds}
                 disabled={loading}
-                className="bg-gold text-vermilion px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all hover:bg-white active:scale-95 disabled:opacity-50"
+                className="w-full sm:w-auto bg-gold text-vermilion px-6 py-2.5 md:py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white active:scale-95 disabled:opacity-50 text-sm md:text-base"
               >
                 {loading ? 'Processing...' : (
                   <>
-                    <Plus size={18} /> Add
+                    <Plus size={18} /> Add Funds
                   </>
                 )}
               </button>
@@ -106,15 +120,15 @@ export const WalletPanel = () => {
       </div>
 
       {/* Transactions */}
-      <div className="bg-white rounded-[2rem] p-8 border border-gold/10 shadow-sm space-y-6">
+      <div className="bg-white rounded-2xl md:rounded-[2rem] p-6 md:p-8 border border-gold/10 shadow-sm space-y-6">
         <div className="flex items-center justify-between border-b border-ivory pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-peacock/5 rounded-full">
-              <History size={20} className="text-peacock" />
+              <History size={18} md:size={20} className="text-peacock" />
             </div>
-            <h3 className="text-xl font-serif font-bold text-vermilion">Transaction History</h3>
+            <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Transaction History</h3>
           </div>
-          <Shield size={20} className="text-gold opacity-30" />
+          <Shield size={18} md:size={20} className="text-gold opacity-30 px-1" />
         </div>
 
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -124,23 +138,23 @@ export const WalletPanel = () => {
             </div>
           ) : (
             myTransactions.map(t => (
-              <div key={t.id} className="flex items-center justify-between p-4 bg-ivory/20 rounded-2xl border border-transparent hover:border-gold/10 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${t.type === 'Recharge' ? 'bg-green-100' : 'bg-red-100'}`}>
+              <div key={t.id} className="flex items-center justify-between p-3 md:p-4 bg-ivory/20 rounded-xl md:rounded-2xl border border-transparent hover:border-gold/10 transition-all">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className={`p-2 md:p-3 rounded-xl ${t.type === 'Recharge' ? 'bg-green-100' : 'bg-red-100'}`}>
                     {t.type === 'Recharge' ? (
-                      <ArrowUpRight size={20} className="text-green-600" />
+                      <ArrowUpRight size={16} md:size={20} className="text-green-600" />
                     ) : (
-                      <ArrowDownRight size={20} className="text-red-600" />
+                      <ArrowDownRight size={16} md:size={20} className="text-red-600" />
                     )}
                   </div>
                   <div>
-                    <div className="font-bold text-gray-800">{t.description}</div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    <div className="font-bold text-gray-800 text-xs md:text-base">{t.description}</div>
+                    <div className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                       {t.timestamp ? format(new Date(t.timestamp), 'dd MMM yyyy, hh:mm a') : 'N/A'}
                     </div>
                   </div>
                 </div>
-                <div className={`text-lg font-bold ${t.type === 'Recharge' ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`text-sm md:text-lg font-bold ${t.type === 'Recharge' ? 'text-green-600' : 'text-red-600'}`}>
                   {t.type === 'Recharge' ? '+' : '-'} ₹{t.amount}
                 </div>
               </div>
