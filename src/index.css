@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Crimson Pro", "Playfair Display", serif;
+
+  --color-vermilion: #8B0000;
+  --color-vermilion-light: #A52A2A;
+  --color-saffron: #FF9933;
+  --color-gold: #D4AF37;
+  --color-ivory: #FFF8E7;
+  --color-peacock: #1B5E20;
+  --color-traditional-text: #2D241E;
+
+  --shadow-gold: 0 4px 14px 0 rgba(212, 175, 55, 0.2);
+  --shadow-traditional: 0 4px 10px rgba(139, 0, 0, 0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-ivory text-traditional-text font-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+.mandala-bg {
+  background-image: url("https://www.transparenttextures.com/patterns/mandala.png");
+  background-repeat: repeat;
+  opacity: 0.03;
+}
+
+.welcome-banner-gradient {
+  background: radial-gradient(circle, #fffdfa 0%, #fff8e7 100%);
+}
+
+.tilak-badge {
+  @apply absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-3 bg-vermilion rounded-t-full rounded-b-sm z-10;
+}
+
+
