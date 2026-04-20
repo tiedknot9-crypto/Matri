@@ -150,6 +150,7 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Select label="Plan Type" options={['Standard', 'Premium', 'Elite']} value={formData.tier} onChange={v => setFormData({...formData, tier: v as any})} />
+                <Input label="Create Login ID" placeholder="e.g., karthik_verma" value={formData.loginId} onChange={v => setFormData({...formData, loginId: v})} />
                 <Input label="Set Portal Password" type="password" value={formData.password} onChange={v => setFormData({...formData, password: v})} />
                 <Input label="Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
                 <Input label="Surname" value={formData.surname} onChange={v => setFormData({...formData, surname: v})} />

@@ -25,6 +25,7 @@ export const getPricing = (tier1: Tier, tier2: Tier): number => {
 
 export interface UserProfile {
   id: string;
+  loginId?: string; // Users can set their own custom login ID
   name: string;
   surname: string;
   age: number;

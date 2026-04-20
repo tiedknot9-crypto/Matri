@@ -3,6 +3,7 @@ import { UserProfile } from './types';
 export const mockProfiles: UserProfile[] = [
   {
     id: '1',
+    loginId: 'priya123',
     name: 'Priya',
     surname: 'Sharma',
     age: 26,
@@ -44,6 +45,7 @@ export const mockProfiles: UserProfile[] = [
   },
   {
     id: '2',
+    loginId: 'aditya_v',
     name: 'Aditya',
     surname: 'Varma',
     age: 29,
@@ -86,6 +88,7 @@ export const mockProfiles: UserProfile[] = [
   },
   {
     id: '3',
+    loginId: 'user',
     name: 'Rahul',
     surname: 'Gupta',
     age: 28,

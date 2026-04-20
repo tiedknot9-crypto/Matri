@@ -113,7 +113,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [settings]);
 
   const addProfile = useCallback((profile: UserProfile) => {
-    setProfiles(prev => [...prev, profile]);
+    setProfiles(prev => [...prev, { ...profile, loginReady: true }]);
   }, []);
 
   const updateProfileStatus = useCallback((id: string, status: 'Approved' | 'Rejected') => {
@@ -268,13 +268,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const login = (id: string, password?: string) => {
+    const normalizedId = id.toLowerCase();
+
     // 1. Check for Admin hardcoded credentials
-    if (id === 'admin' && password === '12345') {
+    if (normalizedId === 'admin' && password === '12345') {
       return 'admin';
     }
 
     // 2. Check for User hardcoded credentials
-    if (id === 'user' && password === '12345') {
+    if (normalizedId === 'user' && password === '12345') {
       // Find or create 'user' profile if it doesn't exist for demo
       let userProfile = profiles.find(p => p.id === 'user_profile_id');
       if (!userProfile) {
@@ -284,7 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           surname: 'User',
           age: 28,
           gender: 'Male',
-          tier: 'Normal',
+          tier: 'Standard',
           photoUrl: 'https://picsum.photos/seed/user123/400/500',
           education: ['Bachelor of Technology'],
           educationDetails: [{ degree: 'B.Tech', institution: 'IIT Delhi', year: '2018' }],
@@ -313,6 +315,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           approvalStatus: 'Approved',
           loginReady: true,
           registeredAt: new Date().toISOString(),
+          password: '12345',
+          loginId: 'user',
           preferences: DEFAULT_PREFERENCES
         };
         setProfiles(prev => [...prev, userProfile as UserProfile]);
@@ -321,9 +325,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return 'user';
     }
 
-    // 3. Normal login by email
-    const user = profiles.find(p => (p.email === id || p.id === id) && p.loginReady);
+    // 3. Normal login by email or loginId
+    const user = profiles.find(p => 
+      (p.email?.toLowerCase() === normalizedId || p.loginId?.toLowerCase() === normalizedId || p.id === id) && 
+      p.password === password && 
+      p.loginReady
+    );
     if (user) {
+      if (user.isSuspended) {
+        alert(`Access Denied: Your account is suspended. Reason: ${user.suspensionReason}`);
+        return false;
+      }
       setCurrentUser(user);
       return 'user';
     }

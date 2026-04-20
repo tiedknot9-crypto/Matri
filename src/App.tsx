@@ -138,7 +138,7 @@ function App() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const result = login(loginEmail, loginPassword);
+    const result = login(loginEmail.trim(), loginPassword.trim());
     if (result === 'admin') {
       setView('admin');
       setShowLogin(false);
@@ -177,6 +177,11 @@ function App() {
       return;
     }
 
+    if (currentUser.approvalStatus !== 'Approved') {
+      alert('Your profile is currently under review by our relationship managers. You will be able to send requests once your account is fully verified.');
+      return;
+    }
+
     const targetProfile = profiles.find(p => p.id === receiverId);
     if (!targetProfile) return;
 
@@ -196,6 +201,11 @@ function App() {
 
   const handleAcceptConnection = (connectionId: string) => {
     if (!currentUser) return;
+
+    if (currentUser.approvalStatus !== 'Approved') {
+      alert('Account Verification Pending: You can receive requests, but acceptance is only permitted for fully verified profiles.');
+      return;
+    }
 
     const conn = connections.find(c => c.id === connectionId);
     if (!conn) return;
