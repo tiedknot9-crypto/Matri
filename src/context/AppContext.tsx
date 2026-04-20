@@ -25,6 +25,8 @@ interface AppContextType {
   rechargeWallet: (userId: string, amount: number) => void;
   debitWallet: (userId: string, amount: number, description: string) => void;
   acceptConnection: (connectionId: string) => void;
+  reportProfile: (userId: string, reason: string) => void;
+  suspendUser: (userId: string, reason: string, status: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -211,6 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       documents: { photo: '', aadhaar: '', pan: '', dl: '', passport: '' },
       approvalStatus: 'Approved',
       loginReady: true,
+      registeredAt: new Date().toISOString(),
     };
     setProfiles(prev => [...prev, managerProfile]);
   }, []);
@@ -248,6 +251,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const acceptConnection = useCallback((connectionId: string) => {
     setConnections(prev => prev.map(c => 
       c.id === connectionId ? { ...c, status: 'Accepted' } : c
+    ));
+  }, []);
+
+  const reportProfile = useCallback((userId: string, reason: string) => {
+    setProfiles(prev => prev.map(p => 
+      p.id === userId ? { ...p, isSuspended: true, suspensionReason: reason } : p
+    ));
+    alert(`Account reported for ${reason}. It has been suspended immediately for review by Digital Communique Private limited.`);
+  }, []);
+
+  const suspendUser = useCallback((userId: string, reason: string, status: boolean) => {
+    setProfiles(prev => prev.map(p => 
+      p.id === userId ? { ...p, isSuspended: status, suspensionReason: reason } : p
     ));
   }, []);
 
@@ -296,6 +312,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           documents: { photo: '', aadhaar: '', pan: '', dl: '', passport: '' },
           approvalStatus: 'Approved',
           loginReady: true,
+          registeredAt: new Date().toISOString(),
           preferences: DEFAULT_PREFERENCES
         };
         setProfiles(prev => [...prev, userProfile as UserProfile]);
@@ -322,7 +339,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       profiles, settings, connections, messages, tickets, managers, transactions, wallets,
       currentUser, login, logout,
       addProfile, updateProfileStatus, updateSettings, updatePreferences, addConnection, 
-      addMessage, addTicket, respondToTicket, addManager, rechargeWallet, debitWallet, acceptConnection
+      addMessage, addTicket, respondToTicket, addManager, rechargeWallet, debitWallet, acceptConnection,
+      reportProfile, suspendUser
     }}>
       {children}
     </AppContext.Provider>

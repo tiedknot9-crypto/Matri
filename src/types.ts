@@ -1,5 +1,27 @@
-export type Tier = 'Normal' | 'Elite';
+export type Tier = 'Standard' | 'Premium' | 'Elite';
 export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export const PRICING_MATRIX: Record<Tier, Record<Tier, number>> = {
+  Standard: {
+    Standard: 20,
+    Premium: 35,
+    Elite: 200 // Assumed based on pattern
+  },
+  Premium: {
+    Standard: 35,
+    Premium: 50,
+    Elite: 300
+  },
+  Elite: {
+    Standard: 200,
+    Premium: 300,
+    Elite: 500
+  }
+};
+
+export const getPricing = (tier1: Tier, tier2: Tier): number => {
+  return PRICING_MATRIX[tier1][tier2];
+};
 
 export interface UserProfile {
   id: string;
@@ -47,6 +69,10 @@ export interface UserProfile {
   loginReady: boolean;
   isManager?: boolean; // If true, shows manager badge
   preferences?: MatchingPreferences;
+  password?: string;
+  registeredAt: string;
+  isSuspended?: boolean;
+  suspensionReason?: string;
 }
 
 export interface Connection {
@@ -181,15 +207,4 @@ export interface Wallet {
   userId: string;
   balance: number;
 }
-
-export const PRICING = {
-  Normal: {
-    request: 200,
-    acceptance: 200,
-  },
-  Elite: {
-    request: 500,
-    acceptance: 500,
-  }
-};
 

@@ -14,7 +14,7 @@ import { Sparkles, Calendar, Clock, MapPin, Search, ShieldCheck, Heart, User, Us
 import { motion, AnimatePresence } from 'motion/react';
 import { getAstrologicalInsight } from './services/astrologyService';
 import { cn } from './lib/utils';
-import { UserProfile, AdminSettings, MatchingPreferences, DEFAULT_PREFERENCES, PRICING } from './types';
+import { UserProfile, AdminSettings, MatchingPreferences, DEFAULT_PREFERENCES, getPricing } from './types';
 import { PreferenceSettings } from './components/PreferenceSettings';
 import { WalletPanel } from './components/WalletPanel';
 
@@ -177,11 +177,14 @@ function App() {
       return;
     }
 
-    const cost = PRICING[currentUser.tier].request;
+    const targetProfile = profiles.find(p => p.id === receiverId);
+    if (!targetProfile) return;
+
+    const cost = getPricing(currentUser.tier, targetProfile.tier);
     const balance = wallets[currentUser.id] || 0;
 
     if (balance < cost) {
-      alert(`Insufficient balance. This action requires ₹${cost}. Please recharge your wallet.`);
+      alert(`Insufficient balance. This action between ${currentUser.tier} & ${targetProfile.tier} requires ₹${cost}. Please recharge your wallet.`);
       setDashboardTab('wallet');
       return;
     }
@@ -194,7 +197,14 @@ function App() {
   const handleAcceptConnection = (connectionId: string) => {
     if (!currentUser) return;
 
-    const cost = PRICING[currentUser.tier].acceptance;
+    const conn = connections.find(c => c.id === connectionId);
+    if (!conn) return;
+
+    const otherUserId = conn.senderId === currentUser.id ? conn.receiverId : conn.senderId;
+    const otherUser = profiles.find(p => p.id === otherUserId);
+    if (!otherUser) return;
+
+    const cost = getPricing(currentUser.tier, otherUser.tier);
     const balance = wallets[currentUser.id] || 0;
 
     if (balance < cost) {
@@ -382,6 +392,9 @@ function App() {
                   A specialized, high-security interface designed for elders. It prioritizes <strong>Verified Lineage</strong>, 
                   <strong>Career Stability</strong>, and <strong>Family Backgrounds</strong>, while simplifying the UI for accessibility.
                 </p>
+                <p className="text-[9px] mt-2 opacity-60 italic text-center border-t border-gold/5 pt-2">
+                  * Astrologer assistance is AI-generated. Users must verify Date of Birth and findings from their own sources.
+                </p>
               </motion.div>
             </motion.div>
           </section>
@@ -415,6 +428,111 @@ function App() {
                   title="Rate Profiles"
                   desc="Give feedback and help us improve recommendations for your family."
                 />
+              </div>
+            </div>
+          </section>
+
+          {/* Auspicious Access Plans */}
+          <section className="py-16 md:py-24 bg-ivory/30 border-y border-gold/10">
+            <div className="container mx-auto px-4 md:px-10">
+              <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-3xl md:text-5xl font-serif font-bold text-vermilion mb-4">Auspicious Access Plans</h2>
+                <p className="text-traditional-text font-serif italic text-lg max-w-2xl mx-auto">
+                  Fair and transparent access for every community. Free registration, pay only for meaningful connections.
+                </p>
+                <div className="w-24 h-1 bg-gold/30 mx-auto rounded-full mt-6"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Standard Plan */}
+                <motion.div 
+                  whileHover={{ y: -10 }}
+                  className="bg-white p-8 rounded-3xl border border-gold/20 shadow-sm relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Users size={80} />
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Standard</h3>
+                  <div className="text-4xl font-bold text-vermilion mb-6">Free <span className="text-sm text-gray-400 font-normal">Registration</span></div>
+                  <ul className="space-y-4 mb-8 text-sm text-gray-600">
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Standard interaction: ₹20</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Basic profile visibility</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Community matching</li>
+                  </ul>
+                  <button onClick={() => setShowLogin(true)} className="w-full py-4 border-2 border-vermilion text-vermilion font-bold rounded-2xl hover:bg-vermilion hover:text-white transition-all">Get Started</button>
+                </motion.div>
+
+                {/* Premium Plan */}
+                <motion.div 
+                   whileHover={{ y: -10 }}
+                   className="bg-white p-8 rounded-3xl border-2 border-gold shadow-2xl relative overflow-hidden transform md:-translate-y-4"
+                >
+                  <div className="absolute top-0 right-0 bg-gold text-vermilion px-4 py-1 rounded-bl-xl text-[10px] font-bold uppercase tracking-widest">Most Preferred</div>
+                  <h3 className="text-2xl font-serif font-bold text-vermilion mb-2">Premium</h3>
+                  <div className="text-4xl font-bold text-vermilion mb-6">Free <span className="text-sm text-gray-400 font-normal">Registration</span></div>
+                  <ul className="space-y-4 mb-8 text-sm text-gray-600">
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Premium interaction: ₹50</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Inter-category access: ₹35</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Highlighted profile</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /> Priority support</li>
+                  </ul>
+                  <button onClick={() => setShowLogin(true)} className="w-full py-4 bg-vermilion text-white font-bold rounded-2xl shadow-xl shadow-vermilion/30 hover:scale-105 transition-all">Select Premium</button>
+                </motion.div>
+
+                {/* Elite Plan */}
+                <motion.div 
+                  whileHover={{ y: -10 }}
+                  className="bg-traditional-text p-8 rounded-3xl border border-white/10 shadow-sm relative overflow-hidden text-white"
+                >
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <ShieldCheck size={80} className="text-gold" />
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-gold mb-2">Elite</h3>
+                  <div className="text-4xl font-bold text-white mb-6">Verified <span className="text-sm text-white/50 font-normal">Entry</span></div>
+                  <ul className="space-y-4 mb-8 text-xs text-white/80">
+                    <li className="flex items-center gap-2 font-bold text-gold"><ShieldCheck size={14} /> Elite match: ₹500</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={14} /> Full access to Elite database</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={14} /> Class 1 / Govt Group A criteria</li>
+                    <li className="flex items-center gap-2"><CheckCircle size={14} /> High income / Net worth group</li>
+                  </ul>
+                  <button onClick={() => setShowLogin(true)} className="w-full py-4 bg-gold text-vermilion font-bold rounded-2xl hover:bg-white transition-all">Request Entry</button>
+                </motion.div>
+              </div>
+
+              {/* Elite Criteria Modal-like Info */}
+              <div className="mt-16 bg-white/50 rounded-3xl p-8 border border-gold/20 flex flex-col lg:flex-row items-center gap-8">
+                <div className="lg:w-1/3 text-center lg:text-left">
+                   <h4 className="text-xl font-serif font-bold text-vermilion mb-4 flex items-center justify-center lg:justify-start gap-2">
+                     <ShieldCheck size={24} className="text-gold" /> Elite Membership Criteria
+                   </h4>
+                   <p className="text-xs text-gray-500 italic">Strictly enforced for high-profile verified matchmaking.</p>
+                </div>
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-ivory rounded-2xl text-[11px] leading-relaxed">
+                    <strong className="text-vermilion block mb-2 uppercase tracking-widest">Public Service</strong>
+                    Class One Services, Civil Services (IAS, IPS, etc.), Central/State Govt Group A, and Public Sector Undertakings.
+                  </div>
+                  <div className="p-4 bg-ivory rounded-2xl text-[11px] leading-relaxed">
+                    <strong className="text-vermilion block mb-2 uppercase tracking-widest">Corporate Leaders</strong>
+                    Professionals, Business Tycoons, and Distinguished Personalities with high industry presence.
+                  </div>
+                  <div className="p-4 bg-ivory rounded-2xl text-[11px] leading-relaxed">
+                    <strong className="text-vermilion block mb-2 uppercase tracking-widest">Financial Threshold</strong>
+                    Private job holders with annual income above ₹20L, ₹50L, or ₹1Cr. Net worth or family worth above ₹10Cr.
+                  </div>
+                  <div className="p-4 bg-ivory rounded-2xl text-[11px] leading-relaxed">
+                    <strong className="text-vermilion block mb-2 uppercase tracking-widest">Social Standing</strong>
+                    Distinguished persons from various fields with high social integrity and achievements.
+                  </div>
+                </div>
+              </div>
+
+              {/* Mandatory Disclaimer */}
+              <div className="mt-12 p-6 bg-red-50/30 rounded-3xl border border-red-100 text-center">
+                <p className="text-[10px] md:text-sm text-gray-600 font-serif leading-relaxed italic">
+                  <strong>Verification Disclaimer:</strong> Users are strictly advised to verify credentials, authenticity, facts, content and declarations made by other users. 
+                  Digital Communique Private limited will not be held responsible for any wrong, false or incomplete declarations/content within the proposals.
+                </p>
               </div>
             </div>
           </section>
@@ -627,7 +745,7 @@ function App() {
                                     onClick={() => handleAcceptConnection(conn.id)}
                                     className="bg-vermilion text-white px-6 py-2 rounded-xl text-xs font-bold shadow-lg shadow-vermilion/20"
                                   >
-                                    Accept (₹{PRICING[currentUser.tier].acceptance})
+                                    Accept (₹{getPricing(currentUser.tier, sender.tier)})
                                   </button>
                                 )}
                               </div>
@@ -721,9 +839,6 @@ function App() {
                        value={loginPassword}
                        onChange={e => setLoginPassword(e.target.value)}
                      />
-                  </div>
-                  <div className="p-3 bg-ivory/30 rounded-xl text-[9px] md:text-[10px] text-gray-400 italic">
-                    For demo: Admin (admin / 12345) | User (user / 12345)
                   </div>
                   <button type="submit" className="w-full bg-vermilion text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg shadow-xl shadow-vermilion/20 hover:scale-[1.02] transition-all">
                     Enter Matrimonial Plus

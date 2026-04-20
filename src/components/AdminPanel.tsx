@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { UserProfile, AdminSettings, Manager } from '../types';
-import { ShieldCheck, Settings, Users, CheckCircle, XCircle, FileText, LayoutDashboard, PlusCircle, Upload, User, GraduationCap, MessageCircle, Heart, UserPlus, Send, LifeBuoy, Wallet, TrendingUp, TrendingDown, Image, Shield } from 'lucide-react';
+import { ShieldCheck, Settings, Users, CheckCircle, XCircle, FileText, LayoutDashboard, PlusCircle, Upload, User, GraduationCap, MessageCircle, Heart, UserPlus, Send, LifeBuoy, Wallet, TrendingUp, TrendingDown, Image, Shield, Search, Filter, Eye, Calendar, Lock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { RegistrationForm, Input, Select, DocUpload } from './RegistrationForm';
 
 export const AdminPanel: React.FC = () => {
-  const { profiles, settings, connections, messages, tickets, managers, transactions, wallets, updateProfileStatus, updateSettings, respondToTicket, addManager, rechargeWallet } = useApp();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'approvals' | 'settings' | 'registration' | 'crm' | 'tickets' | 'team' | 'finance' | 'policies'>('dashboard');
+  const { profiles, settings, connections, messages, tickets, managers, transactions, wallets, updateProfileStatus, updateSettings, respondToTicket, addManager, rechargeWallet, suspendUser } = useApp();
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'approvals' | 'users' | 'settings' | 'registration' | 'crm' | 'tickets' | 'team' | 'finance' | 'policies'>('dashboard');
 
   const pendingApprovals = profiles.filter(p => p.approvalStatus === 'Pending');
+  const approvedProfiles = profiles.filter(p => p.approvalStatus === 'Approved');
   const openTickets = tickets.filter(t => t.status === 'Open');
 
   return (
@@ -27,7 +28,8 @@ export const AdminPanel: React.FC = () => {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={18} />} label="Dashboard" />
           <TabButton active={activeTab === 'registration'} onClick={() => setActiveTab('registration')} icon={<PlusCircle size={18} />} label="Add Profile" />
-          <TabButton active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} icon={<FileText size={18} />} label="Approvals" badge={pendingApprovals.length} />
+          <TabButton active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} icon={<FileText size={18} />} label="Pending Approvals" badge={pendingApprovals.length} />
+          <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon={<Users size={18} />} label="User Directory" badge={approvedProfiles.length} />
           <TabButton active={activeTab === 'crm'} onClick={() => setActiveTab('crm')} icon={<Heart size={18} />} label="CRM & Chats" />
           <TabButton active={activeTab === 'tickets'} onClick={() => setActiveTab('tickets')} icon={<LifeBuoy size={18} />} label="Support" badge={openTickets.length} />
           <TabButton active={activeTab === 'team'} onClick={() => setActiveTab('team')} icon={<UserPlus size={18} />} label="Team" />
@@ -42,6 +44,7 @@ export const AdminPanel: React.FC = () => {
         {activeTab === 'dashboard' && <Dashboard profiles={profiles} tickets={tickets} connections={connections} transactions={transactions} />}
         {activeTab === 'registration' && <RegistrationForm settings={settings} />}
         {activeTab === 'approvals' && <ApprovalsView profiles={pendingApprovals} onUpdate={updateProfileStatus} />}
+        {activeTab === 'users' && <UsersView profiles={approvedProfiles} onUpdate={updateProfileStatus} onSuspend={suspendUser} />}
         {activeTab === 'crm' && <CRMView profiles={profiles} connections={connections} messages={messages} />}
         {activeTab === 'tickets' && <TicketsView tickets={tickets} profiles={profiles} onRespond={respondToTicket} />}
         {activeTab === 'team' && <TeamView managers={managers} onAdd={addManager} />}
@@ -386,7 +389,7 @@ const StatCard = ({ icon, label, value }: any) => (
 const ApprovalsView = ({ profiles, onUpdate }: { profiles: UserProfile[], onUpdate: any }) => (
   <div className="space-y-8">
     <div className="border-b border-gold/20 pb-4">
-      <h1 className="text-3xl font-serif font-bold text-vermilion">Profile Approvals</h1>
+      <h1 className="text-3xl font-serif font-bold text-vermilion">Pending Approvals</h1>
       <p className="text-gray-500">Review documents and verify applicants</p>
     </div>
 
@@ -430,6 +433,184 @@ const ApprovalsView = ({ profiles, onUpdate }: { profiles: UserProfile[], onUpda
         ))}
       </div>
     )}
+  </div>
+);
+
+const UsersView = ({ profiles, onUpdate, onSuspend }: { profiles: UserProfile[], onUpdate: any, onSuspend: any }) => {
+  const [filterPlan, setFilterPlan] = useState<string>('All');
+  const [filterDate, setFilterDate] = useState<string>('');
+  const [selectedDocs, setSelectedDocs] = useState<UserProfile | null>(null);
+
+  const filteredProfiles = profiles.filter(p => {
+    const matchesPlan = filterPlan === 'All' || p.tier === filterPlan;
+    const matchesDate = !filterDate || (p.registeredAt && p.registeredAt.includes(filterDate));
+    return matchesPlan && matchesDate;
+  });
+
+  return (
+    <div className="space-y-8">
+      <div className="border-b border-gold/20 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-vermilion">User Directory</h1>
+          <p className="text-gray-500">Manage credentials, filters and security</p>
+        </div>
+        <div className="flex gap-4">
+          <div className="relative">
+            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <select 
+              className="pl-9 pr-4 py-2 bg-white border border-gold/20 rounded-xl text-xs font-bold outline-none"
+              value={filterPlan}
+              onChange={(e) => setFilterPlan(e.target.value)}
+            >
+              <option value="All">All Plans</option>
+              <option value="Standard">Standard</option>
+              <option value="Premium">Premium</option>
+              <option value="Elite">Elite</option>
+            </select>
+          </div>
+          <div className="relative">
+            <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input 
+              type="date"
+              className="pl-9 pr-4 py-2 bg-white border border-gold/20 rounded-xl text-xs font-bold outline-none"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {filteredProfiles.length === 0 ? (
+        <div className="bg-white p-20 rounded-3xl text-center border border-dashed border-gold/30">
+          <Users className="mx-auto text-gray-300 mb-4" size={48} />
+          <p className="text-gray-500 font-serif">No users match your criteria.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6">
+          {filteredProfiles.map(profile => (
+            <div key={profile.id} className={`bg-white p-6 rounded-2xl shadow-sm border ${profile.isSuspended ? 'border-red-500 bg-red-50/10' : 'border-gold/10'} flex flex-col gap-6`}>
+              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden border border-gold/20 flex-shrink-0">
+                    {profile.photoUrl ? (
+                      <img src={profile.photoUrl} alt={profile.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="w-full h-full bg-ivory flex items-center justify-center text-gold">
+                        <User size={32} />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-vermilion">
+                      {profile.name} {profile.surname} 
+                      {profile.isSuspended && <span className="ml-2 text-[10px] bg-red-500 text-white px-2 py-0.5 rounded uppercase">Suspended</span>}
+                    </h3>
+                    <p className="text-xs text-gray-500">{profile.religion} • {profile.caste} • {profile.location}</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-[10px] font-bold text-peacock bg-peacock/5 px-2 py-0.5 rounded uppercase">Tier: {profile.tier}</span>
+                      <span className="text-[10px] font-bold text-gray-400 capitalize">ID: {profile.id}</span>
+                      <span className="text-[10px] text-gray-400">Reg: {profile.registeredAt?.split('T')[0] || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button 
+                    onClick={() => setSelectedDocs(profile)}
+                    className="px-4 py-2 bg-ivory border border-gold/20 rounded-xl text-xs font-bold text-gray-600 hover:bg-gold/10 flex items-center gap-2"
+                  >
+                    <Image size={14} /> Documents
+                  </button>
+                  <button 
+                    onClick={() => onSuspend(profile.id, 'Administrative Review', !profile.isSuspended)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                      profile.isSuspended ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
+                    }`}
+                  >
+                    {profile.isSuspended ? 'Lift Suspension' : 'Suspend Account'}
+                  </button>
+                  <button 
+                     onClick={() => onUpdate(profile.id, 'Pending')}
+                     className="px-4 py-2 bg-ivory border border-gold/20 rounded-xl text-xs font-bold text-gray-600 hover:bg-gold/10"
+                   >
+                    Reset Approval
+                  </button>
+                </div>
+              </div>
+
+              {/* Admin Privileged Info */}
+              <div className="mt-2 p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 space-y-1">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Login Email / ID</span>
+                  <div className="flex items-center gap-2 text-sm font-mono text-peacock">
+                    <Send size={12} /> {profile.email}
+                  </div>
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Portal Password</span>
+                  <div className="flex items-center gap-2 text-sm font-mono text-red-600">
+                    <Lock size={12} /> {profile.password || '12345 (Demo)'}
+                  </div>
+                </div>
+                {profile.phone && (
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Contact Number</span>
+                    <div className="text-sm font-mono text-gray-700">{profile.phone}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Document Viewer Modal */}
+      {selectedDocs && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white w-full max-w-4xl rounded-[2rem] overflow-hidden shadow-2xl relative"
+          >
+            <button 
+              onClick={() => setSelectedDocs(null)}
+              className="absolute top-6 right-6 w-10 h-10 bg-ivory rounded-full flex items-center justify-center text-gray-400 hover:text-vermilion"
+            >
+              <XCircle size={24} />
+            </button>
+            
+            <div className="p-8 border-b border-ivory">
+              <h2 className="text-2xl font-serif font-bold text-vermilion">Verification Documents</h2>
+              <p className="text-sm text-gray-500">Applicant: {selectedDocs.name} {selectedDocs.surname}</p>
+            </div>
+
+            <div className="p-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+              <DocPreview label="Aadhaar" status={selectedDocs.documents.aadhaar} />
+              <DocPreview label="PAN Card" status={selectedDocs.documents.pan} />
+              <DocPreview label="Driving License" status={selectedDocs.documents.dl} />
+              <DocPreview label="Passport" status={selectedDocs.documents.passport} />
+            </div>
+
+            <div className="p-8 bg-ivory/30 flex justify-end gap-4">
+               <button onClick={() => setSelectedDocs(null)} className="px-6 py-2 text-gray-500 font-bold uppercase tracking-widest text-xs">Close Gallery</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DocPreview = ({ label, status }: { label: string, status: string }) => (
+  <div className="flex flex-col gap-2">
+    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</span>
+    <div className="aspect-[3/4] bg-ivory rounded-xl border-2 border-dashed border-gold/20 flex flex-col items-center justify-center p-4 text-center gap-2 group hover:bg-gold/5 transition-all">
+      <FileText size={32} className="text-gold/40 group-hover:text-gold transition-colors" />
+      <span className="text-[9px] font-bold text-gray-500 uppercase">{status === 'uploaded' ? 'View Document' : 'Not Provided'}</span>
+      <div className="w-full h-1 bg-gold/10 rounded-full overflow-hidden mt-2">
+         {status === 'uploaded' && <div className="w-full h-full bg-green-500" />}
+      </div>
+    </div>
   </div>
 );
 

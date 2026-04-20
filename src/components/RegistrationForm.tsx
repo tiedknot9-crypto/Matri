@@ -53,6 +53,7 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
     loginReady: false,
     gender: 'Male', // Default
     location: '',
+    tier: 'Standard',
   });
 
   const [lookingFor, setLookingFor] = useState<'Bride' | 'Groom'>('Bride');
@@ -80,7 +81,7 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
       ...formData as UserProfile, 
       id, 
       age: 25, 
-      tier: 'Normal',
+      registeredAt: new Date().toISOString(),
       preferences: DEFAULT_PREFERENCES
     });
     alert('Registration successful! Profile submitted for admin approval.');
@@ -148,6 +149,8 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
                 <h3 className="text-lg md:text-xl font-serif font-bold text-vermilion">Step 1: Personal Identity</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Select label="Plan Type" options={['Standard', 'Premium', 'Elite']} value={formData.tier} onChange={v => setFormData({...formData, tier: v as any})} />
+                <Input label="Set Portal Password" type="password" value={formData.password} onChange={v => setFormData({...formData, password: v})} />
                 <Input label="Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
                 <Input label="Surname" value={formData.surname} onChange={v => setFormData({...formData, surname: v})} />
                 
@@ -449,6 +452,12 @@ export const RegistrationForm = ({ settings, isPublic = false }: { settings: Adm
         </div>
 
         {/* Navigation Buttons */}
+        <div className="mt-8 md:mt-10 p-4 bg-red-50/20 rounded-2xl border border-red-100/50 mb-6">
+          <p className="text-[10px] text-gray-500 font-serif leading-relaxed italic text-center">
+            <strong>Mandatory Notice:</strong> By submitted, you agree that Digital Communique Private limited is not responsible for the authenticity of user declarations. Please verify all facts and partner credentials independently.
+          </p>
+        </div>
+
         <div className="mt-8 md:mt-12 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-ivory pt-6 md:pt-8">
           <div className="flex items-center justify-between w-full md:w-auto gap-4">
             <button 

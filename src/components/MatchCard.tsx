@@ -1,8 +1,9 @@
 import React from 'react';
-import { Heart, Star, ShieldCheck, UserCheck } from 'lucide-react';
-import { UserProfile, PRICING } from '../types';
+import { Heart, Star, ShieldCheck, UserCheck, Shield } from 'lucide-react';
+import { UserProfile, getPricing } from '../types';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
+import { useApp } from '../context/AppContext';
 
 interface MatchCardProps {
   profile: UserProfile;
@@ -11,7 +12,9 @@ interface MatchCardProps {
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({ profile, onConnect, isFamilyMode }) => {
+  const { currentUser, reportProfile } = useApp();
   const isElite = profile.tier === 'Elite';
+  const displayCost = currentUser ? getPricing(currentUser.tier, profile.tier) : 0;
 
   return (
     <motion.div
@@ -105,21 +108,35 @@ export const MatchCard: React.FC<MatchCardProps> = ({ profile, onConnect, isFami
             {isFamilyMode ? 'Background Verified' : 'Matching Potential: High ✨'}
           </div>
           
-          <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             <button
               onClick={() => onConnect(profile.id)}
+              disabled={profile.isSuspended}
               className={cn(
                 "flex-1 sm:flex-none px-4 py-2 text-[11px] rounded-md font-bold transition-all border border-transparent shadow-sm",
+                profile.isSuspended ? "bg-gray-200 cursor-not-allowed text-gray-500" :
                 isFamilyMode ? "bg-saffron text-white hover:bg-saffron/90" : "bg-saffron text-white hover:opacity-90"
               )}
             >
-              {isFamilyMode ? 'Request Meeting' : `रुचि व्यक्त करें (₹${PRICING[profile.tier].request})`}
+              {profile.isSuspended ? 'Account Suspended' : (isFamilyMode ? 'Request Meeting' : `रुचि व्यक्त करें (₹${displayCost})`)}
             </button>
             <button className={cn(
               "px-4 py-2 border text-[11px] rounded-md font-bold transition-all shadow-sm",
               isFamilyMode ? "bg-white text-saffron border-saffron hover:bg-orange-50" : "bg-transparent text-vermilion border-gold hover:bg-ivory"
             )}>
               Family View
+            </button>
+            <button 
+              onClick={() => {
+                const reason = prompt('Reason for reporting? (Fraud/Abusive)');
+                if (reason && reportProfile) {
+                  reportProfile(profile.id, reason);
+                }
+              }}
+              className="px-2 py-2 text-red-500 hover:bg-red-50 rounded-md transition-all border border-transparent hover:border-red-100"
+              title="Report Profile"
+            >
+              <Shield size={14} />
             </button>
           </div>
         </div>
